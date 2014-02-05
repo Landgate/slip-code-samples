@@ -1,0 +1,76 @@
+<!--
+  Based on https://developers.google.com/maps/documentation/javascript/examples/layer-dynamicmapsengine
+-->
+<!doctype html>
+<html lang="en-gb">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>SLIP Future Google Maps JavaScript API</title>
+
+    <style type="text/css">
+      html, body, .map {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+
+  <body onload="init();">
+    <div id="map" class="map"></div>
+  </body>
+
+  <script src="http://maps.google.com/maps/api/js?v=3&amp;sensor=false&amp;libraries=visualization"></script>
+  <script>
+  var map;
+
+  function init() {
+    var mapOptions = {
+      center: new google.maps.LatLng(-31.658284, 115.706901),
+      zoom: 16,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+    // Landgate Imagery
+    new google.maps.visualization.MapsEngineLayer({
+      layerId: '09372590152434720789-02344374277596842979',
+      map: map
+    });
+
+    // Water Pipes
+    var water_pipes = new google.maps.visualization.DynamicMapsEngineLayer({
+      mapId: '09372590152434720789-00913315481290556980',
+      layerKey: 'layer_00196',
+      map: map
+    });
+
+    google.maps.event.addListener(water_pipes, 'mouseover', function(event) {
+      // https://developers.google.com/maps/documentation/javascript/reference#FeatureStyle
+      var style = water_pipes.getFeatureStyle(event.featureId);
+      style.strokeColor = 'red';
+    });
+    google.maps.event.addListener(water_pipes, 'mouseout', function(event) {
+      water_pipes.getFeatureStyle(event.featureId).resetAll();
+    });
+
+    google.maps.event.addListener(water_pipes, 'click', function(event) {
+      console.log("event", event);
+      console.log("getLayerKey", water_pipes.getLayerKey());
+      console.log("getMapId", water_pipes.getMapId());
+      console.log("getProperties", water_pipes.getProperties());
+      console.log("getStatus", water_pipes.getStatus());
+
+      event.getDetails(function(event) {
+        // https://developers.google.com/maps/documentation/javascript/reference#MapsEngineMouseEvent
+        console.log("featureId", event.featureId);
+        console.log("infoWindowHtml", event.infoWindowHtml);
+        console.log("latLng", event.latLng);
+        console.log("pixelOffset", event.pixelOffset);
+      });
+    });
+  }
+  </script>
+</html>
